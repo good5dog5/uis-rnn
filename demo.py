@@ -47,6 +47,30 @@ def diarization_experiment(model_args, training_args, inference_args):
   test_cluster_ids = np.load('./data/test_cluster_id.npy', allow_pickle=True)
 
   # Apply test set splititing from (https://github.com/HarryVolek/PyTorch_Speaker_Verification/issues/17)
+  test_sequences_2 = []
+  test_sequences_block = []
+  
+  test_cluster_ids_2 = []
+  test_cluster_ids_block = []
+  
+  count1 = 0
+  
+  for test_sequence, test_cluster_id in zip(test_sequences, test_cluster_ids):
+      test_sequences_block.append(test_sequence)
+      test_cluster_ids_block.append(test_cluster_id)
+      
+      count1 = count1 + 1
+      if count1 != 0 and count1 % 100 == 0:
+          test_sequences_2.append(test_sequences_block)
+          test_sequences_block = []
+          test_cluster_ids_2.append(test_cluster_ids_block)
+          test_cluster_ids_block = []
+  
+  test_sequences = test_sequences_2
+  test_cluster_ids = test_cluster_ids_2
+  np.save('./data/new_test.npy', test_sequences)
+
+  
   
 
 
@@ -63,17 +87,22 @@ def diarization_experiment(model_args, training_args, inference_args):
   # You can also try uisrnn.parallel_predict to speed up with GPU.
   # But that is a beta feature which is not thoroughly tested, so
   # proceed with caution.
-  for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-    predicted_cluster_id = model.predict(test_sequence, inference_args)
-    predicted_cluster_ids.append(predicted_cluster_id)
-    accuracy = uisrnn.compute_sequence_match_accuracy(
-        test_cluster_id, predicted_cluster_id)
-    test_record.append((accuracy, len(test_cluster_id)))
-    print('Ground truth labels:')
-    print(test_cluster_id)
-    print('Predicted labels:')
-    print(predicted_cluster_id)
-    print('-' * 80)
+  # for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
+  print(f'test_sequence.ndim: {test_sequence.ndim}')
+  print("%" * 100)
+  print(test_sequence.shape, type(test_sequence))
+  print(test_cluster_id, type(test_cluster_id))
+
+  predicted_cluster_id = model.predict(test_sequence, inference_args)
+  predicted_cluster_ids.append(predicted_cluster_id)
+  accuracy = uisrnn.compute_sequence_match_accuracy(
+      test_cluster_id, predicted_cluster_id)
+  test_record.append((accuracy, len(test_cluster_id)))
+  print('Ground truth labels:')
+  print(test_cluster_id)
+  print('Predicted labels:')
+  print(predicted_cluster_id)
+  print('-' * 80)
 
   output_string = uisrnn.output_result(model_args, training_args, test_record)
 

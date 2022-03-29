@@ -1,0 +1,5 @@
+data/test_sequence.npy filter=lfs diff=lfs merge=lfs -text
+data/train_cluster_id.npy filter=lfs diff=lfs merge=lfs -text
+data/train_sequence.npy filter=lfs diff=lfs merge=lfs -text
+data/new_test.npy filter=lfs diff=lfs merge=lfs -text
+data/test_cluster_id.npy filter=lfs diff=lfs merge=lfs -text
