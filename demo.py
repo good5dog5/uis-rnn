@@ -67,14 +67,14 @@ def diarization_experiment(model_args, training_args, inference_args):
         test_id_2.append(batch_id)
         batch_id = []
 
-    np.save('./data/new_test.npy', test_sequences)
+  np.save('./data/new_test.npy', test_sequences)
 
-    # (45,100,256) -> [array(100,256), array(100,256) .... ]
-    test_seq_2 = np.empty(len(test_seq_2), object)
-    test_seq_2[:] = [np.array(a) for a in test_seq_2]
+  # (45,100,256) -> [array(100,256), array(100,256) .... ]
+  test_seq_2 = np.empty(len(test_seq_2), object)
+  test_seq_2[:] = [np.array(a) for a in test_seq_2]
 
-    test_sequences = test_seq_2
-    test_cluster_ids = test_id_2
+  test_sequences = test_seq_2
+  test_cluster_ids = test_id_2
 
 
 
