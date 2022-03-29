@@ -35,12 +35,20 @@ def diarization_experiment(model_args, training_args, inference_args):
   predicted_cluster_ids = []
   test_record = []
 
-  train_data = np.load('./data/toy_training_data.npz', allow_pickle=True)
-  test_data = np.load('./data/toy_testing_data.npz', allow_pickle=True)
-  train_sequence = train_data['train_sequence']
-  train_cluster_id = train_data['train_cluster_id']
-  test_sequences = test_data['test_sequences'].tolist()
-  test_cluster_ids = test_data['test_cluster_ids'].tolist()
+  #train_data = np.load('./data/toy_training_data.npz', allow_pickle=True)
+  #test_data = np.load('./data/toy_testing_data.npz', allow_pickle=True)
+  #train_sequence = train_data['train_sequence']
+  #train_cluster_id = train_data['train_cluster_id']
+  #test_sequences = test_data['test_sequences'].tolist()
+  #test_cluster_ids = test_data['test_cluster_ids'].tolist()
+  train_sequence = np.load('./data/train_sequence.npy', allow_pickle=True)
+  train_cluster_id = np.load('./data/train_cluster_id.npy', allow_pickle=True)
+  test_sequences = np.load('./data/test_sequence.npy', allow_pickle=True)
+  test_cluster_ids = np.load('./data/test_cluster_id.npy', allow_pickle=True)
+
+  # Apply test set splititing from (https://github.com/HarryVolek/PyTorch_Speaker_Verification/issues/17)
+  
+
 
   model = uisrnn.UISRNN(model_args)
 
