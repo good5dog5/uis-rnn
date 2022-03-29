@@ -46,32 +46,37 @@ def diarization_experiment(model_args, training_args, inference_args):
   test_sequences = np.load('./data/test_sequence.npy', allow_pickle=True)
   test_cluster_ids = np.load('./data/test_cluster_id.npy', allow_pickle=True)
 
-  # Apply test set splititing from (https://github.com/HarryVolek/PyTorch_Speaker_Verification/issues/17)
-  test_sequences_2 = []
-  test_sequences_block = []
-  
-  test_cluster_ids_2 = []
-  test_cluster_ids_block = []
-  
-  count1 = 0
-  
-  for test_sequence, test_cluster_id in zip(test_sequences, test_cluster_ids):
-      test_sequences_block.append(test_sequence)
-      test_cluster_ids_block.append(test_cluster_id)
-      
-      count1 = count1 + 1
-      if count1 != 0 and count1 % 100 == 0:
-          test_sequences_2.append(test_sequences_block)
-          test_sequences_block = []
-          test_cluster_ids_2.append(test_cluster_ids_block)
-          test_cluster_ids_block = []
-  
-  test_sequences = test_sequences_2
-  test_cluster_ids = test_cluster_ids_2
-  np.save('./data/new_test.npy', test_sequences)
 
-  
-  
+  # Apply test set splititing from (https://github.com/HarryVolek/PyTorch_Speaker_Verification/issues/17)
+  test_seq_2 = []
+  test_id_2 = []
+
+  batch_seq = []
+  batch_id = []
+
+  count = 0
+  for test_sequence, test_cluster_id in zip(test_sequences, test_cluster_ids):
+    batch_seq.append(test_sequence)
+    batch_id.append(test_cluster_id)
+
+    count = count + 1
+    if count != 0 and count % 100 == 0:
+        test_seq_2.append(batch_seq)
+        batch_seq = []
+
+        test_id_2.append(batch_id)
+        batch_id = []
+
+    np.save('./data/new_test.npy', test_sequences)
+
+    # (45,100,256) -> [array(100,256), array(100,256) .... ]
+    test_seq_2 = np.empty(len(test_seq_2), object)
+    test_seq_2[:] = [np.array(a) for a in test_seq_2]
+
+    test_sequences = test_seq_2
+    test_cluster_ids = test_id_2
+
+
 
 
   model = uisrnn.UISRNN(model_args)
