@@ -55,11 +55,15 @@ def diarization_experiment(model_args, training_args, inference_args):
   batch_id = []
 
   count = 0
+  print('################### origin ############')
+  print(f'test_sequences.shape: {test_sequences.shape}, test_sequences.ndim: {test_sequences.ndim}')
   for test_sequence, test_cluster_id in zip(test_sequences, test_cluster_ids):
+    #print(test_sequence)
+    #print(test_cluster_id)
     batch_seq.append(test_sequence)
     batch_id.append(test_cluster_id)
 
-    count = count + 1
+    count +=  1
     if count != 0 and count % 100 == 0:
         test_seq_2.append(batch_seq)
         batch_seq = []
@@ -67,15 +71,15 @@ def diarization_experiment(model_args, training_args, inference_args):
         test_id_2.append(batch_id)
         batch_id = []
 
-  np.save('./data/new_test.npy', test_sequences)
-
   # (45,100,256) -> [array(100,256), array(100,256) .... ]
-  test_seq_2 = np.empty(len(test_seq_2), object)
-  test_seq_2[:] = [np.array(a) for a in test_seq_2]
+  res = np.empty(len(test_seq_2), object)
+  res[:] = [np.array(a) for a in test_seq_2 ]
 
-  test_sequences = test_seq_2
+  test_sequences = res
   test_cluster_ids = test_id_2
-
+  np.save('./data/new_test.npy', test_sequences)
+  print(test_sequences.shape, test_sequences.ndim)
+  print(test_sequences[0].shape, test_sequences[0].ndim)
 
 
 
@@ -92,22 +96,19 @@ def diarization_experiment(model_args, training_args, inference_args):
   # You can also try uisrnn.parallel_predict to speed up with GPU.
   # But that is a beta feature which is not thoroughly tested, so
   # proceed with caution.
-  # for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
-  print(f'test_sequence.ndim: {test_sequence.ndim}')
-  print("%" * 100)
-  print(test_sequence.shape, type(test_sequence))
-  print(test_cluster_id, type(test_cluster_id))
+  for (test_sequence, test_cluster_id) in zip(test_sequences, test_cluster_ids):
+    print("%" * 100)
 
-  predicted_cluster_id = model.predict(test_sequence, inference_args)
-  predicted_cluster_ids.append(predicted_cluster_id)
-  accuracy = uisrnn.compute_sequence_match_accuracy(
-      test_cluster_id, predicted_cluster_id)
-  test_record.append((accuracy, len(test_cluster_id)))
-  print('Ground truth labels:')
-  print(test_cluster_id)
-  print('Predicted labels:')
-  print(predicted_cluster_id)
-  print('-' * 80)
+    predicted_cluster_id = model.predict(test_sequence, inference_args)
+    predicted_cluster_ids.append(predicted_cluster_id)
+    accuracy = uisrnn.compute_sequence_match_accuracy(
+        test_cluster_id, predicted_cluster_id)
+    test_record.append((accuracy, len(test_cluster_id)))
+    print('Ground truth labels:')
+    print(test_cluster_id)
+    print('Predicted labels:')
+    print(predicted_cluster_id)
+    print('-' * 80)
 
   output_string = uisrnn.output_result(model_args, training_args, test_record)
 
